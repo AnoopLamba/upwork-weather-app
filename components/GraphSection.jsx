@@ -1,5 +1,5 @@
 const GraphSection = () => {
-  return <div>GraphSection</div>;
+  return <div className="max-w-[900px] w-full mx-auto mt-10">GraphSection</div>;
 };
 
 export default GraphSection;

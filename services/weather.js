@@ -2,10 +2,10 @@ import axios from "axios";
 
 const apiKey = process.env.OPENWEATHER_API_KEY;
 
-async function getWeather(lat, lon) {
+async function getWeather(city) {
   try {
     const res = await axios.get(
-      `api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
     );
     return res.data;
   } catch (e) {
