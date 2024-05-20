@@ -6,30 +6,20 @@ import {
   Transition,
 } from "@headlessui/react";
 import clsx from "clsx";
-import { useState } from "react";
-import { CheckIcon, DownIcon } from "./common/Icon";
+import { DownIcon } from "./common/Icon";
+import { weekDays } from "./common/Helper";
 
-const people = [
-  { id: 1, name: "Tom Cook" },
-  { id: 2, name: "Wade Cooper" },
-  { id: 3, name: "Tanya Fox" },
-  { id: 4, name: "Arlene Mccoy" },
-  { id: 5, name: "Devon Webb" },
-];
-
-export default function CommonListBox() {
-  const [selected, setSelected] = useState(people[1]);
-
+export default function WeekdayListBox({ selectedDay, setSelectedDay }) {
   return (
-    <div className="mx-auto h-screen w-52 pt-20">
-      <Listbox value={selected} onChange={setSelected}>
+    <div className="mx-auto w-52">
+      <Listbox value={selectedDay} onChange={setSelectedDay}>
         <ListboxButton
           className={clsx(
-            "relative block w-full rounded-lg bg-white/5 py-1.5 pr-8 pl-3 text-left text-sm/6 text-white",
+            "relative w-full flex items-center justify-between rounded-lg bg-red-500 py-1.5 px-3 text-left text-sm/6 text-white",
             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
           )}
         >
-          {selected.name}
+          {selectedDay.name}
           <div>
             <DownIcon />
           </div>
@@ -41,17 +31,14 @@ export default function CommonListBox() {
         >
           <ListboxOptions
             anchor="bottom"
-            className="w-[var(--button-width)] rounded-xl border border-white/5 bg-white/5 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none"
+            className="w-[var(--button-width)] rounded-xl border border-white/5 bg-pink-400 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none"
           >
-            {people.map((person) => (
+            {weekDays.map((person) => (
               <ListboxOption
                 key={person.name}
                 value={person}
                 className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-white/10"
               >
-                <div>
-                  <CheckIcon />
-                </div>
                 <div className="text-sm/6 text-white">{person.name}</div>
               </ListboxOption>
             ))}

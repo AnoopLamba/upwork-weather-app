@@ -1,79 +1,77 @@
 "use client";
 
-import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-  Transition,
-} from "@headlessui/react";
-import clsx from "clsx";
-import { useState } from "react";
-import { CheckIcon, DownIcon } from "./common/Icon";
+import { useEffect, useState } from "react";
+import countriesService from "../services/countries";
+import { ChooseLocationIcon } from "./common/Icon";
 
-const people = [
-  { id: 1, name: "Tom Cook" },
-  { id: 2, name: "Wade Cooper" },
-  { id: 3, name: "Tanya Fox" },
-  { id: 4, name: "Arlene Mccoy" },
-  { id: 5, name: "Devon Webb" },
-];
-
-export default function SelectLocationComboBox() {
+const SelectLocationComboBox = ({ selectedCountry, setSelectedCountry }) => {
+  const [countries, setCountries] = useState([]);
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(people[1]);
 
-  const filteredPeople =
-    query === ""
-      ? people
-      : people.filter((person) => {
-          return person.name.toLowerCase().includes(query.toLowerCase());
-        });
+  useEffect(() => {
+    const localData = JSON.parse(localStorage.getItem("countries"));
+    if (localData) {
+      setCountries(localData);
+    } else {
+      countriesService
+        .getAll()
+        .then((data) => {
+          setCountries(data);
+          localStorage.setItem("countries", JSON.stringify(data));
+        })
+        .catch((error) => console.log(error.message));
+    }
+  }, []);
+
+  const filteredResults = countries.filter((country) =>
+    country.name.common.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
-    <div className="w-52">
-      <Combobox value={selected} onChange={(value) => setSelected(value)}>
-        <div className="relative">
-          <ComboboxInput
-            className={clsx(
-              "w-full rounded-lg border-none bg-white/5 py-1.5 pr-8 pl-3 text-sm/6 text-white",
-              "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
-            )}
-            displayValue={(person) => person?.name}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <ComboboxButton className="group absolute inset-y-0 right-0 px-2.5">
-            <div>
-              <DownIcon />
-            </div>
-          </ComboboxButton>
-        </div>
-        <Transition
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-          afterLeave={() => setQuery("")}
+    <>
+      {selectedCountry ? (
+        <button
+          onClick={() => setSelectedCountry(null)}
+          className="text-lg font-extrabold text-blue-800 flex items-center justify-center gap-2 outline-none"
         >
-          <ComboboxOptions
-            anchor="bottom"
-            className="w-[var(--input-width)] rounded-xl border border-white/5 bg-white/5 p-1 [--anchor-gap:var(--spacing-1)] empty:hidden"
-          >
-            {filteredPeople.map((person) => (
-              <ComboboxOption
-                key={person.id}
-                value={person}
-                className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-white/10"
-              >
-                <div>
-                  <CheckIcon />
-                </div>
-                <div className="text-sm/6 text-white">{person.name}</div>
-              </ComboboxOption>
-            ))}
-          </ComboboxOptions>
-        </Transition>
-      </Combobox>
-    </div>
+          <div>
+            <ChooseLocationIcon />
+          </div>
+          {selectedCountry}
+        </button>
+      ) : (
+        <div className="max-w-[250px] w-full flex flex-col gap-2 items-center justify-center text-white font-poppins text-base sm:text-lg">
+          <input
+            placeholder="Search..."
+            name="country"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full h-[40px] sm:h-[50px] px-3 sm:px-4 border-2 border-solid border-transparent rounded-lg sm:rounded-xl outline-none bg-[#24343D] transition-all duration-200 ease-in-out shadow-lg focus:border-2 focus:border-solid focus:border-[#5C93B1] focus:shadow-[0px_0px_0px_5px_rgba(74,157,236,20%)]"
+          />
+          {filteredResults.length > 3 ? (
+            query !== "" && (
+              <p className="w-full min-h-[45px] px-4 py-2 text-xs sm:text-lg text-center text-blue-800">
+                Too many matches, be more specific!
+              </p>
+            )
+          ) : (
+            <div className="w-full bg-[#3A5E72] flex flex-col justify-start divide-y-[1px] divide-slate-700 shadow-2xl rounded-lg sm:rounded-xl overflow-hidden">
+              {filteredResults.map((country) => (
+                <button
+                  key={country.name.common}
+                  onClick={() => setSelectedCountry(country.name.common)}
+                  className="min-h-[35px] sm:min-h-[45px] px-3 sm:px-4 py-2 w-full cursor-pointer hover:bg-[#5C93B1] transition-all duration-300 ease-in-out outline-none"
+                >
+                  {country.name.common}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
-}
+};
+
+export default SelectLocationComboBox;

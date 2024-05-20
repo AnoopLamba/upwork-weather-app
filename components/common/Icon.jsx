@@ -46,7 +46,7 @@ export const DownIcon = () => {
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
-      stroke="currentColor"
+      stroke="#1e40af"
       className="w-6 h-6"
     >
       <path
